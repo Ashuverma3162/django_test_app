@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import date, datetime
+from json import dumps
 
 # Create your models here.
 class Animal(models.Model):
@@ -19,3 +21,17 @@ class Animal(models.Model):
     def __unicode__(self):
        return self.name
 
+    def as_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "birthday": dumps(self.birthday, default=json_serial)
+        }
+
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))

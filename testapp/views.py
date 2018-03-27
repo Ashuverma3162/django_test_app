@@ -3,10 +3,11 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime
+
 
 from models import Animal
 
@@ -17,7 +18,8 @@ def get_animals(request, owner_id):
     Retrieve the list of animals for the owner making this request
     """
     animals = Animal.objects.filter(owner_id=int(owner_id))
-    return HttpResponse(animals)
+    animal_dicts = [ obj.as_dict() for obj in animals ]
+    return HttpResponse(json.dumps({"data": animal_dicts}), content_type='application/json')
 
 
 @require_http_methods(['POST'])
